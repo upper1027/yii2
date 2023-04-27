@@ -1,0 +1,70 @@
+version: '3.7'
+services:
+  redis:
+    image: redis
+    container_name: redis
+    command:
+      - "redis-server"
+      - "--databases 256"
+    ports:
+      - "16379:6379"
+    restart: "always"
+    networks:
+      - es-net
+  mysql:
+    image: "mysql/mysql-server:5.7"
+    container_name: mysql
+    environment:
+      TZ: "Asia/Shanghai"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_ROOT_PASSWORD: "ckx1027471200"
+      MYSQL_DATABASE: "study"
+    networks:
+      - es-net
+    restart: "always"
+    volumes:
+      - ./.github/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "13306:3306"
+  rabbitmq:
+    image: "rabbitmq:3.9-management"
+    container_name: "rabbitmq"
+    networks:
+      - es-net
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "admin"
+      RABBITMQ_DEFAULT_PASS: "ckx1027471200"
+    restart: always
+  es:
+    image: 'elasticsearch:7.12.1'
+    container_name: es
+    environment:
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    networks:
+      - es-net
+    ports:
+      - "19200:9200"
+      - "19300:9300"
+    volumes:
+      - /Users/chenkexin/App/es-data:/usr/share/elasticsearch/data
+    privileged: true
+    restart: "always"
+  kibana:
+    image: "kibana:7.12.1"
+    container_name: "kibana"
+    networks:
+      - es-net
+    ports:
+      - "15601:5601"
+    environment:
+      ELASTICSEARCH_URL: http://es:9200
+      ELASTICSEARCH_HOSTS: http://es:9200
+    restart: "always"
+networks:
+  es-net:
+    external: true
