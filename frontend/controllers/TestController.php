@@ -55,7 +55,7 @@ class TestController extends BaseController
                     ],
                     [
                         "multi_match" => [
-                            "query" => "1",
+                            "query" => "顾村",
                             "fields" => [
                                 "name",
                                 "address",

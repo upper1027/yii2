@@ -39,6 +39,19 @@ services:
       RABBITMQ_DEFAULT_USER: "admin"
       RABBITMQ_DEFAULT_PASS: "ckx1027471200"
     restart: always
+
+  kibana:
+    image: "kibana:7.12.1"
+    container_name: "kibana"
+    networks:
+      - es-net
+    ports:
+      - "15601:5601"
+    environment:
+      ELASTICSEARCH_URL: http://es:9200
+      ELASTICSEARCH_HOSTS: http://es:9200
+    restart: "always"
+
   es:
     image: 'elasticsearch:7.12.1'
     container_name: es
@@ -52,19 +65,11 @@ services:
       - "19300:9300"
     volumes:
       - /Users/chenkexin/App/es-data:/usr/share/elasticsearch/data
+      - /Users/chenkexin/App/es-plugins:/usr/share/elasticsearch/plugins
+      - /Users/chenkexin/App/es-log:/usr/share/elasticsearch/logs
     privileged: true
     restart: "always"
-  kibana:
-    image: "kibana:7.12.1"
-    container_name: "kibana"
-    networks:
-      - es-net
-    ports:
-      - "15601:5601"
-    environment:
-      ELASTICSEARCH_URL: http://es:9200
-      ELASTICSEARCH_HOSTS: http://es:9200
-    restart: "always"
+
 networks:
   es-net:
     external: true
